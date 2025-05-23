@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh">
 <head>
@@ -60,19 +61,13 @@
     <button class="btn" onclick="window.location.href='https://github.com/ina2002'">Visit my GitHub</button>
   </div>
 
-  <!-- 加载并初始化 canvas-nest -->
-  <script src="canvas-nest.min.js"></script>
-  <script>
-    window.onload = function () {
-      if (window.CanvasNest) {
-        new CanvasNest(document.body, {
-          color: '0,128,255',
-          opacity: 0.4,
-          zIndex: -1,
-          count: 100
-        });
-      }
-    };
+  <!-- 本地版 canvas-nest -->
+  <script
+    color: '0,128,255',
+    opacity: 0.4,
+    zIndex: -1,
+    count: 100
+    src="canvas-nest.min.js">
   </script>
 </body>
 </html>
