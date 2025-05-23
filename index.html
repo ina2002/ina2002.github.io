@@ -121,7 +121,9 @@
       });
       requestAnimationFrame(draw);
     }
-    requestAnimationFrame(draw);
+
+    // ✅ 必须在定义后调用，否则为 undefined
+    draw();
   }();
   </script>
 </body>
