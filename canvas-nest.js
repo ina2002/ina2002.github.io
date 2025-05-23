@@ -1,4 +1,4 @@
-(document.getElementById("cas"), (f = document.getElementsByTagName("script"), {
+(document.body, (f = document.getElementsByTagName("script"), {
         zIndex: (y = f[f.length - 1]).getAttribute("zIndex"),
         opacity: y.getAttribute("opacity"),
         color: y.getAttribute("color"),
