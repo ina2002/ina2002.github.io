@@ -60,14 +60,19 @@
     <button class="btn" onclick="window.location.href='https://github.com/ina2002'">访问我的 GitHub</button>
   </div>
 
-  <!-- 粒子背景脚本延迟加载，防止 document.body 未定义错误 -->
-  <script
-    src="canvas-nest.min.js"
-    color="0,128,255"
-    opacity="0.4"
-    zIndex="-1"
-    count="100"
-    defer>
+  <!-- 引入 canvas-nest.min.js 脚本 -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-nest.js@1.0.1/dist/canvas-nest.min.js"></script>
+
+  <!-- 初始化 canvas-nest -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      new CanvasNest(document.body, {
+        color: '0,128,255',
+        opacity: 0.4,
+        zIndex: -1,
+        count: 100
+      });
+    });
   </script>
 </body>
 </html>
