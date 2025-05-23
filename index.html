@@ -1,57 +1,55 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <title>Fengjing Zhu's Canvas Nest</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #ffffff;
-        }
-        #cas {
-            width: 600px;
-            height: 400px;
-            border: 1px solid #ccc;
-            margin: 50px auto;
-            position: relative;
-            background-color: #f9f9f9;
-        }
-        canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-        .welcome {
-            margin-top: 30px;
-            font-size: 24px;
-            font-weight: bold;
-        }
-        .github-button {
-            margin-top: 20px;
-            padding: 10px 20px;
-            font-size: 16px;
-            border: none;
-            background-color: #24292e;
-            color: white;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .github-button:hover {
-            background-color: #444c56;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Fengjing Zhu's Canvas Nest</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1; /* 背景 */
+    }
+    .content {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      margin-top: 20%;
+      color: #333;
+    }
+    .content h1 {
+      font-size: 32px;
+    }
+    .github-button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      background-color: #24292e;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .github-button:hover {
+      background-color: #444c56;
+    }
+  </style>
 </head>
 <body>
 
-<div id="cas"></div>
-
-<div class="welcome">I am Fengjing Zhu, welcome 👋</div>
-
-<a href="https://github.com/ina2002" target="_blank">
+<div class="content">
+  <h1>I am Fengjing Zhu, welcome 👋</h1>
+  <a href="https://github.com/ina2002" target="_blank">
     <button class="github-button">前往我的 GitHub：ina2002</button>
-</a>
+  </a>
+</div>
 
 <script src="canvas-nest.js"></script>
 
