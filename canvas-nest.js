@@ -1,104 +1,115 @@
 (function () {
-    const config = {
-        opacity: 0.7,
-        count: 100
-    };
+  function CanvasNest(canvas, config) {
+    this.canvas = canvas || document.createElement('canvas');
+    this.context = this.canvas.getContext('2d');
+    this.config = Object.assign({
+      color: '0,0,0',
+      pointColor: '0,0,0',
+      opacity: 0.5,
+      zIndex: -1,
+      count: 99,
+      colorArray: null // 新增：允许传颜色数组
+    }, config);
 
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
+    this.particles = [];
+    this.mouse = { x: null, y: null };
+    this.init();
+  }
+
+  CanvasNest.prototype.init = function () {
+    const canvas = this.canvas;
+    const context = this.context;
+    const config = this.config;
+    const colorArray = config.colorArray;
+
+    canvas.style.cssText = `position:fixed;top:0;left:0;z-index:${config.zIndex};opacity:${config.opacity};`;
     document.body.appendChild(canvas);
 
-    function resize() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-    }
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
     resize();
     window.addEventListener('resize', resize);
 
-    function randomColor() {
-        const r = Math.floor(Math.random() * 256);
-        const g = Math.floor(Math.random() * 256);
-        const b = Math.floor(Math.random() * 256);
-        return `rgba(${r},${g},${b},${config.opacity})`;
-    }
-
-    const particles = [];
     for (let i = 0; i < config.count; i++) {
-        particles.push({
-            x: Math.random() * window.innerWidth,
-            y: Math.random() * window.innerHeight,
-            vx: (Math.random() - 0.5) * 1.5,
-            vy: (Math.random() - 0.5) * 1.5,
-            color: randomColor()
-        });
+      const color = colorArray ? colorArray[i % colorArray.length] : config.color;
+      this.particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5),
+        vy: (Math.random() - 0.5),
+        color: color
+      });
     }
 
-    const mouse = { x: null, y: null };
-    document.addEventListener('mousemove', e => {
-        mouse.x = e.clientX;
-        mouse.y = e.clientY;
+    document.addEventListener('mousemove', (e) => {
+      this.mouse.x = e.clientX;
+      this.mouse.y = e.clientY;
     });
     document.addEventListener('mouseleave', () => {
-        mouse.x = null;
-        mouse.y = null;
+      this.mouse.x = null;
+      this.mouse.y = null;
     });
 
-    function draw() {
-        context.clearRect(0, 0, canvas.width, canvas.height);
+    this.animate();
+  };
 
-        for (let i = 0; i < particles.length; i++) {
-            const p1 = particles[i];
+  CanvasNest.prototype.animate = function () {
+    const context = this.context;
+    const particles = this.particles;
+    const config = this.config;
+    const mouse = this.mouse;
+    const canvas = this.canvas;
 
-            // 连线
-            for (let j = i + 1; j < particles.length; j++) {
-                const p2 = particles[j];
-                const dx = p1.x - p2.x;
-                const dy = p1.y - p2.y;
-                const dist = dx * dx + dy * dy;
-                if (dist < 6000) {
-                    context.beginPath();
-                    context.strokeStyle = p1.color;
-                    context.moveTo(p1.x, p1.y);
-                    context.lineTo(p2.x, p2.y);
-                    context.stroke();
-                }
-            }
+    context.clearRect(0, 0, canvas.width, canvas.height);
 
-            // 鼠标吸引
-            if (mouse.x !== null && mouse.y !== null) {
-                const dx = mouse.x - p1.x;
-                const dy = mouse.y - p1.y;
-                const dist = dx * dx + dy * dy;
-                if (dist < 10000) {
-                    context.beginPath();
-                    context.strokeStyle = p1.color;
-                    context.moveTo(p1.x, p1.y);
-                    context.lineTo(mouse.x, mouse.y);
-                    context.stroke();
+    particles.forEach((p, i) => {
+      // 移动
+      p.x += p.vx;
+      p.y += p.vy;
 
-                    const pull = 0.02;
-                    p1.vx += dx * pull / 100;
-                    p1.vy += dy * pull / 100;
-                }
-            }
+      if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+      if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
 
-            // 更新位置
-            p1.x += p1.vx;
-            p1.y += p1.vy;
+      // 绘制点
+      context.beginPath();
+      context.fillStyle = `rgba(${p.color},${config.opacity})`;
+      context.arc(p.x, p.y, 1.5, 0, Math.PI * 2, true);
+      context.fill();
 
-            // 边界反弹
-            if (p1.x < 0 || p1.x > canvas.width) p1.vx *= -1;
-            if (p1.y < 0 || p1.y > canvas.height) p1.vy *= -1;
-
-            // 绘制点
-            context.beginPath();
-            context.fillStyle = p1.color;
-            context.arc(p1.x, p1.y, 1.5, 0, Math.PI * 2);
-            context.fill();
+      // 连线
+      for (let j = i + 1; j < particles.length; j++) {
+        const q = particles[j];
+        const dx = p.x - q.x;
+        const dy = p.y - q.y;
+        const dist = dx * dx + dy * dy;
+        if (dist < 6000) {
+          context.beginPath();
+          context.strokeStyle = `rgba(${p.color},${config.opacity})`;
+          context.moveTo(p.x, p.y);
+          context.lineTo(q.x, q.y);
+          context.stroke();
         }
+      }
 
-        requestAnimationFrame(draw);
-    }
+      // 鼠标连线
+      if (mouse.x !== null && mouse.y !== null) {
+        const dx = p.x - mouse.x;
+        const dy = p.y - mouse.y;
+        const dist = dx * dx + dy * dy;
+        if (dist < 10000) {
+          context.beginPath();
+          context.strokeStyle = `rgba(${p.color},${config.opacity})`;
+          context.moveTo(p.x, p.y);
+          context.lineTo(mouse.x, mouse.y);
+          context.stroke();
+        }
+      }
+    });
 
-    draw();
+    requestAnimationFrame(this.animate.bind(this));
+  };
+
+  window.CanvasNest = CanvasNest;
 })();

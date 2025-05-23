@@ -9,7 +9,6 @@
       padding: 0;
       height: 100%;
       overflow: hidden;
-      background: #fff;
       font-family: Arial, sans-serif;
     }
     canvas {
@@ -22,8 +21,7 @@
       position: relative;
       z-index: 10;
       text-align: center;
-      top: 40%;
-      transform: translateY(-40%);
+      margin-top: 20%;
       color: #333;
     }
     .content h1 {
@@ -47,14 +45,33 @@
 <body>
 
 <div class="content">
-  <h1>I am Fengjing Zhu, welcome 👋</h1>
+  <h1>Hello, I'm Fengjing Zhu 👋</h1>
   <a href="https://github.com/ina2002" target="_blank">
-    <button class="github-button">前往我的 GitHub：ina2002</button>
+    <button class="github-button">Visit my GitHub: @ina2002</button>
   </a>
 </div>
 
-<!-- 确保此文件与你 HTML 同目录 -->
+
+<!-- 多彩 canvas -->
 <script src="canvas-nest.js"></script>
+<script>
+  const dopamineColors = [
+    '255,0,0',     // 红
+    '0,255,0',     // 绿
+    '0,0,255',     // 蓝
+    '255,255,0',   // 黄
+    '255,0,255',   // 粉
+    '0,255,255',   // 青
+    '255,165,0',   // 橙
+    '154,50,205'   // 紫
+  ];
+
+  new CanvasNest(null, {
+    opacity: 0.8,
+    count: 150,
+    colorArray: dopamineColors
+  });
+</script>
 
 </body>
 </html>
