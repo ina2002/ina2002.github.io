@@ -31,7 +31,6 @@
       padding: 15px 0;
       z-index: 100;
       box-shadow: 0 2px 20px rgba(0,0,0,0.1);
-      transition: all 0.3s ease;
     }
     
     .nav-container {
@@ -66,6 +65,7 @@
       transition: all 0.3s ease;
       padding: 5px 15px;
       border-radius: 20px;
+      cursor: pointer;
     }
     
     .nav-links a:hover, .nav-links a.active {
@@ -186,6 +186,7 @@
       font-size: 16px;
       margin-bottom: 30px;
       transition: all 0.3s ease;
+      display: none;
     }
     
     .add-area-btn:hover {
@@ -224,20 +225,13 @@
       margin: 0;
     }
     
-    .area-title[contenteditable="true"] {
-      background: rgba(255, 255, 255, 0.8);
-      padding: 8px 15px;
-      border-radius: 8px;
-      border-left: 4px solid #4ecdc4;
-    }
-    
     .area-controls {
       display: flex;
       gap: 10px;
     }
     
     .btn {
-      background: #ff6b6b;
+      background: #4ecdc4;
       color: white;
       border: none;
       padding: 6px 12px;
@@ -250,10 +244,6 @@
     .btn:hover {
       transform: translateY(-1px);
       box-shadow: 0 3px 10px rgba(0,0,0,0.3);
-    }
-    
-    .btn.add {
-      background: #4ecdc4;
     }
     
     .btn.delete {
@@ -285,17 +275,6 @@
       padding-right: 80px;
     }
     
-    .paper-title[contenteditable="true"],
-    .paper-authors[contenteditable="true"],
-    .paper-venue[contenteditable="true"],
-    .paper-opinion[contenteditable="true"] {
-      background: rgba(255, 255, 255, 0.9);
-      padding: 8px;
-      border-radius: 5px;
-      border: 2px solid #4ecdc4;
-      outline: none;
-    }
-    
     .paper-authors {
       font-size: 14px;
       color: #666;
@@ -324,6 +303,14 @@
       font-weight: bold;
       color: #ff6b6b;
       margin-bottom: 5px;
+    }
+    
+    [contenteditable="true"] {
+      background: rgba(255, 255, 255, 0.9) !important;
+      padding: 8px !important;
+      border-radius: 5px !important;
+      border: 2px solid #4ecdc4 !important;
+      outline: none !important;
     }
     
     /* 模态框样式 */
@@ -443,10 +430,6 @@
         font-size: 36px;
       }
       
-      .home-content p {
-        font-size: 18px;
-      }
-      
       .papers-content {
         padding: 20px 15px;
       }
@@ -517,12 +500,59 @@
       🎉 编辑模式已开启！点击文字即可编辑，使用按钮添加新内容
     </div>
     
-    <button class="add-area-btn" id="addAreaBtn" style="display: none;">
+    <button class="add-area-btn" id="addAreaBtn">
       ➕ 添加新的研究领域
     </button>
     
     <div id="researchAreas">
-      <!-- 研究领域将动态生成 -->
+      <!-- 初始内容 -->
+      <div class="research-area">
+        <div class="area-header">
+          <h2 class="area-title">机器学习</h2>
+          <div class="area-controls" style="display: none;">
+            <button class="btn" onclick="showAddPaperModal('机器学习')">➕ 添加论文</button>
+            <button class="btn delete" onclick="deleteArea('机器学习')">🗑️ 删除领域</button>
+          </div>
+        </div>
+        <div class="papers-container">
+          <div class="paper-item">
+            <div class="paper-controls" style="display: none;">
+              <button class="btn delete" onclick="deletePaper('机器学习', 0)">🗑️</button>
+            </div>
+            <div class="paper-title">Attention Is All You Need</div>
+            <div class="paper-authors">Ashish Vaswani, Noam Shazeer, Niki Parmar, et al.</div>
+            <div class="paper-venue">NIPS 2017</div>
+            <div class="paper-opinion">
+              <div class="opinion-label">我的观点：</div>
+              这篇论文彻底改变了自然语言处理领域。Transformer架构的提出不仅解决了RNN的并行化问题，更重要的是通过自注意力机制能够更好地捕捉长距离依赖关系。
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="research-area">
+        <div class="area-header">
+          <h2 class="area-title">计算机视觉</h2>
+          <div class="area-controls" style="display: none;">
+            <button class="btn" onclick="showAddPaperModal('计算机视觉')">➕ 添加论文</button>
+            <button class="btn delete" onclick="deleteArea('计算机视觉')">🗑️ 删除领域</button>
+          </div>
+        </div>
+        <div class="papers-container">
+          <div class="paper-item">
+            <div class="paper-controls" style="display: none;">
+              <button class="btn delete" onclick="deletePaper('计算机视觉', 0)">🗑️</button>
+            </div>
+            <div class="paper-title">Vision Transformer (ViT): An Image is Worth 16x16 Words</div>
+            <div class="paper-authors">Alexey Dosovitskiy, Lucas Beyer, Alexander Kolesnikov, et al.</div>
+            <div class="paper-venue">ICLR 2021</div>
+            <div class="paper-opinion">
+              <div class="opinion-label">我的观点：</div>
+              ViT证明了Transformer架构在计算机视觉领域的潜力。虽然在小数据集上表现不如CNN，但在大数据集上的优异表现显示了其强大的表示学习能力。
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -695,137 +725,135 @@
 <!-- 主脚本 -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // 初始化数据
-  let researchData = {
-    '机器学习': [
-      {
-        title: 'Attention Is All You Need',
-        authors: 'Ashish Vaswani, Noam Shazeer, Niki Parmar, et al.',
-        venue: 'NIPS 2017',
-        opinion: '这篇论文彻底改变了自然语言处理领域。Transformer架构的提出不仅解决了RNN的并行化问题，更重要的是通过自注意力机制能够更好地捕捉长距离依赖关系。虽然计算复杂度较高，但其在各种NLP任务上的优异表现证明了这种权衡的价值。这个架构后来成为了GPT、BERT等大型语言模型的基础。'
-      },
-      {
-        title: 'ResNet: Deep Residual Learning for Image Recognition',
-        authors: 'Kaiming He, Xiangyu Zhang, Shaoqing Ren, Jian Sun',
-        venue: 'CVPR 2016',
-        opinion: '残差连接的提出是深度学习发展的一个重要里程碑。通过解决深层网络的梯度消失问题，ResNet使得训练真正的深层网络成为可能。这个简单而优雅的想法不仅在计算机视觉领域产生了巨大影响，也启发了后续许多网络架构的设计。'
-      }
-    ],
-    '计算机视觉': [
-      {
-        title: 'Vision Transformer (ViT): An Image is Worth 16x16 Words',
-        authors: 'Alexey Dosovitskiy, Lucas Beyer, Alexander Kolesnikov, et al.',
-        venue: 'ICLR 2021',
-        opinion: 'ViT证明了Transformer架构在计算机视觉领域的潜力。虽然在小数据集上表现不如CNN，但在大数据集上的优异表现显示了其强大的表示学习能力。这篇论文开启了视觉Transformer的研究热潮，但我认为当前的ViT在处理局部特征方面仍有改进空间。'
-      }
-    ],
-    '自然语言处理': [
-      {
-        title: 'BERT: Pre-training of Deep Bidirectional Transformers',
-        authors: 'Jacob Devlin, Ming-Wei Chang, Kenton Lee, Kristina Toutanova',
-        venue: 'NAACL 2019',
-        opinion: 'BERT的双向预训练策略是一个突破性的创新。与之前单向的语言模型不同，BERT能够同时利用上下文信息，这使得它在理解任务上表现出色。掩码语言模型的预训练任务设计得很巧妙，能够有效学习到丰富的语言表示。不过，BERT的计算效率仍有优化空间。'
-      }
-    ]
-  };
-
-  // 编辑模式状态
+  // 状态变量
   let isEditMode = false;
   let currentAreaForPaper = null;
-
+  
   // DOM 元素
-  const navLinks = document.querySelectorAll('.nav-link');
-  const pages = document.querySelectorAll('.page');
   const editToggle = document.getElementById('editToggle');
   const editHint = document.getElementById('editHint');
   const addAreaBtn = document.getElementById('addAreaBtn');
-  const researchAreasContainer = document.getElementById('researchAreas');
-  
-  // 模态框元素
   const areaModal = document.getElementById('areaModal');
   const paperModal = document.getElementById('paperModal');
-
-  // 初始化页面导航
+  
+  // 页面导航
+  const navLinks = document.querySelectorAll('.nav-link');
+  const pages = document.querySelectorAll('.page');
+  
+  // 导航功能
   navLinks.forEach(link => {
     link.addEventListener('click', function(e) {
       e.preventDefault();
+      console.log('Navigation clicked:', this.getAttribute('href'));
+      
       navLinks.forEach(l => l.classList.remove('active'));
       pages.forEach(p => p.classList.remove('active'));
+      
       this.classList.add('active');
       const targetPage = this.getAttribute('href').substring(1);
-      document.getElementById(targetPage).classList.add('active');
+      const targetElement = document.getElementById(targetPage);
+      if (targetElement) {
+        targetElement.classList.add('active');
+      }
     });
   });
-
-  // 渲染研究领域
-  function renderResearchAreas() {
-    researchAreasContainer.innerHTML = '';
-    
-    Object.keys(researchData).forEach(areaName => {
-      const areaDiv = document.createElement('div');
-      areaDiv.className = 'research-area';
-      areaDiv.innerHTML = `
-        <div class="area-header">
-          <h2 class="area-title">${areaName}</h2>
-          <div class="area-controls" style="display: ${isEditMode ? 'flex' : 'none'}">
-            <button class="btn add" onclick="openPaperModal('${areaName}')">➕ 添加论文</button>
-            <button class="btn delete" onclick="deleteArea('${areaName}')">🗑️ 删除领域</button>
-          </div>
-        </div>
-        <div class="papers-container">
-          ${researchData[areaName].map((paper, index) => `
-            <div class="paper-item">
-              <div class="paper-controls" style="display: ${isEditMode ? 'flex' : 'none'}">
-                <button class="btn delete" onclick="deletePaper('${areaName}', ${index})">🗑️</button>
-              </div>
-              <div class="paper-title" ${isEditMode ? 'contenteditable="true"' : ''} 
-                   onblur="updatePaperField('${areaName}', ${index}, 'title', this.textContent)">${paper.title}</div>
-              <div class="paper-authors" ${isEditMode ? 'contenteditable="true"' : ''} 
-                   onblur="updatePaperField('${areaName}', ${index}, 'authors', this.textContent)">${paper.authors}</div>
-              <div class="paper-venue" ${isEditMode ? 'contenteditable="true"' : ''} 
-                   onblur="updatePaperField('${areaName}', ${index}, 'venue', this.textContent)">${paper.venue}</div>
-              <div class="paper-opinion" ${isEditMode ? 'contenteditable="true"' : ''} 
-                   onblur="updatePaperField('${areaName}', ${index}, 'opinion', this.textContent)">
-                <div class="opinion-label">我的观点：</div>
-                ${paper.opinion}
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      `;
-      researchAreasContainer.appendChild(areaDiv);
-    });
-
-    // 使领域标题可编辑
-    if (isEditMode) {
-      document.querySelectorAll('.area-title').forEach(title => {
-        title.contentEditable = true;
-        title.addEventListener('blur', function() {
-          const oldName = Object.keys(researchData).find(name => 
-            this.textContent !== name && researchData[name]
-          );
-          if (oldName && this.textContent.trim() !== '') {
-            researchData[this.textContent.trim()] = researchData[oldName];
-            delete researchData[oldName];
-          }
-        });
-      });
-    }
-  }
-
+  
   // 编辑模式切换
   editToggle.addEventListener('click', function() {
+    console.log('Edit toggle clicked');
     isEditMode = !isEditMode;
     this.textContent = isEditMode ? '退出编辑' : '编辑模式';
     this.classList.toggle('active', isEditMode);
     editHint.classList.toggle('show', isEditMode);
     addAreaBtn.style.display = isEditMode ? 'block' : 'none';
-    renderResearchAreas();
+    
+    // 切换所有控制按钮的显示
+    document.querySelectorAll('.area-controls, .paper-controls').forEach(control => {
+      control.style.display = isEditMode ? 'flex' : 'none';
+    });
+    
+    // 切换可编辑状态
+    document.querySelectorAll('.area-title, .paper-title, .paper-authors, .paper-venue, .paper-opinion').forEach(element => {
+      element.contentEditable = isEditMode;
+      if (isEditMode) {
+        element.style.cursor = 'text';
+      } else {
+        element.style.cursor = 'default';
+      }
+    });
   });
-
-  // 添加新研究领域
+  
+  // 添加研究领域
   addAreaBtn.addEventListener('click', function() {
+    console.log('Add area button clicked');
     areaModal.style.display = 'block';
   });
-
+  
   // 保存新研究领域
+  document.getElementById('saveArea').addEventListener('click', function() {
+    const areaName = document.getElementById('areaName').value.trim();
+    if (areaName) {
+      addNewArea(areaName);
+      areaModal.style.display = 'none';
+      document.getElementById('areaName').value = '';
+    }
+  });
+  
+  // 取消添加研究领域
+  document.getElementById('cancelArea').addEventListener('click', function() {
+    areaModal.style.display = 'none';
+    document.getElementById('areaName').value = '';
+  });
+  
+  // 保存新论文
+  document.getElementById('savePaper').addEventListener('click', function() {
+    const title = document.getElementById('paperTitle').value.trim();
+    const authors = document.getElementById('paperAuthors').value.trim();
+    const venue = document.getElementById('paperVenue').value.trim();
+    const opinion = document.getElementById('paperOpinion').value.trim();
+    
+    if (title && authors && venue && opinion && currentAreaForPaper) {
+      addNewPaper(currentAreaForPaper, { title, authors, venue, opinion });
+      paperModal.style.display = 'none';
+      clearPaperForm();
+    }
+  });
+  
+  // 取消添加论文
+  document.getElementById('cancelPaper').addEventListener('click', function() {
+    paperModal.style.display = 'none';
+    clearPaperForm();
+  });
+  
+  // 点击模态框外部关闭
+  window.addEventListener('click', function(event) {
+    if (event.target === areaModal) {
+      areaModal.style.display = 'none';
+    }
+    if (event.target === paperModal) {
+      paperModal.style.display = 'none';
+    }
+  });
+  
+  // 添加新研究领域的函数
+  function addNewArea(areaName) {
+    const researchAreas = document.getElementById('researchAreas');
+    const newArea = document.createElement('div');
+    newArea.className = 'research-area';
+    newArea.innerHTML = `
+      <div class="area-header">
+        <h2 class="area-title" ${isEditMode ? 'contenteditable="true"' : ''}>${areaName}</h2>
+        <div class="area-controls" style="display: ${isEditMode ? 'flex' : 'none'};">
+          <button class="btn" onclick="showAddPaperModal('${areaName}')">➕ 添加论文</button>
+          <button class="btn delete" onclick="deleteArea('${areaName}')">🗑️ 删除领域</button>
+        </div>
+      </div>
+      <div class="papers-container">
+        <p style="text-align: center; color: #666; font-style: italic;">暂无论文，点击上方按钮添加</p>
+      </div>
+    `;
+    researchAreas.appendChild(newArea);
+  }
+  
+  // 添加新论文的函数
+  function addNewPaper(
